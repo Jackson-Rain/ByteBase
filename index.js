@@ -20,4 +20,5 @@ bytebase.iterate(name, (vals) => {
     for (let i=0; i<vals.length; i++)
         console.log(labels[i]+': '+vals[i]);
 });
+
 bytebase.release();

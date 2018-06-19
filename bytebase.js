@@ -11,7 +11,6 @@ const TYPE_LONG   = 3;
 const TYPE_SIZES = [1,4,4,8]; 
 
 var writeStreams = {};
-var readStreams = {};
 
 var tableNames = [];
 var tableKeys = {};
@@ -43,6 +42,7 @@ function ByteBase(path) {
         catch (err) { if (err.code != 'EEXIST') throw(err); }
     }
 
+    /** creates folder, and table key file */
     this.createTable = function(name, labels, types) {
         let dir = this.path + "/" + name + "/";
         // err if table exists
@@ -60,8 +60,8 @@ function ByteBase(path) {
         console.log(o);
     };
 
-    // loads key and opens requested streams
-    this.initTable = function(name, reading, writing) {
+    /** loads key and opens requested streams for writing or reading */
+    this.initTable = function(name, writing) {
         let dir = this.path + '/' + name + '/';
         // parse table key
         let key = fs.readFileSync(dir+'key.txt', { encoding: 'utf8' });
@@ -86,17 +86,15 @@ function ByteBase(path) {
             rowSize: rowSize,
         };
 
-        // open file reader/writer
-        if (reading && !writeStreams[name]) writeStreams[name] = 
+        // open file writer
+        if (!writeStreams[name]) writeStreams[name] = 
             fs.createWriteStream(dir+'data.bin');
-        if (writing && !readStreams[name]) readStreams[name] = 
-            fs.createReadStream(dir+'data.bin');
-
     };
     
+    /** add row(s) to table with given name */
     this.append = function(tablename, values) {
         if (!writeStreams[tablename]) 
-            throw 'Must call initTable() with writing set to true before writing.';
+            throw 'Must call initTable(\'name\', true) before writing.';
         let key = tableKeys[tablename];
         let rows = values.length / key.labels.length;
         if (rows % 1 != 0) throw 'Wrong number of values.';
@@ -114,6 +112,7 @@ function ByteBase(path) {
         writeStreams[tablename].write(bb.buffer);
     };
 
+    /** iterate table with given name, calling callback on rows */
     this.iterate = function(name, callback) {
         let key = tableKeys[name];
         let data = '';
@@ -144,6 +143,7 @@ function ByteBase(path) {
         });
     };
 
+    /** print column names and data types */
     this.print = function() {
         let types = ['b', 'i', 'f', 'l'];
         let o = '~~~~~~~~ByteBase~~~~~~~~\n';
@@ -160,19 +160,12 @@ function ByteBase(path) {
         console.log(o);
     };
 
+    /** end any open writestreams */
     this.release = function() {
         let keys = Object.keys(writeStreams);
         for (let i=0; i<keys.length; i++) {
             writeStreams[keys].end();
             delete writeStreams[keys];
         }
-        keys = Object.keys(readStreams);
-        for (let i=0; i<keys.length; i++) {
-            //readStreams[keys].end();
-            delete readStreams[keys];
-        }
     };
 };
-
-//ByteBase.prototype.etc = "";
-
