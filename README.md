@@ -21,6 +21,7 @@ let scruffy = [1, 23.1, 2.42, 3.68];
 bytebase.createTable(tablename, labels, types);
 bytebase.initTable(tablename, true);
 bytebase.print(); // prints table header to console
+
 // append a one-legged dog and release bytebuffer
 bytebase.append(tablename, scruffy);
 bytebase.release();
