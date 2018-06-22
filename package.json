@@ -2,7 +2,7 @@
   "name": "bytebase",
   "version": "1.0.2",
   "description": "Minimalist data storage",
-  "main": "index.js",
+  "main": "bytebase.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
