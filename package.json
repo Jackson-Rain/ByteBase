@@ -1,6 +1,6 @@
 {
   "name": "bytebase",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Minimalist data storage",
   "main": "bytebase.js",
   "scripts": {
