@@ -1,5 +1,5 @@
 var ByteBase = require('./bytebase.js');
-var bytebase = new ByteBase('./database');
+var bytebase = new ByteBase('database');
 
 let name = 'dogs';
 let labels = ['legs', 'weight', 'height', 'length'];

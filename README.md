@@ -4,7 +4,7 @@ A simple database framework that uses ByteBuffer to store data tables in binary.
 ## Usage
 ```javascript
 var ByteBase = require('bytebase');
-var bytebase = new ByteBase();
+var bytebase = new ByteBase('database'); // 'database' is any directory name
 ```
 
 ### Create and append to a new table
