@@ -20,7 +20,7 @@ let scruffy = [1, 23.1, 2.42, 3.68];
 // create and open table for writing
 bytebase.createTable(tablename, labels, types);
 bytebase.initTable(tablename, true);
-bytebase.print(); // prints table header to console
+bytebase.print(); // prints all table keys to console
 
 // append a one-legged dog and release bytebuffer
 bytebase.append(tablename, scruffy);

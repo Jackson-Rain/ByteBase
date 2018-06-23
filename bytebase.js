@@ -133,7 +133,7 @@ ByteBase.prototype.iterate = function(name, callback) {
     });
 };
 
-/** print column names and data types */
+/** print column names and data types for all tables */
 ByteBase.prototype.print = function() {
     let types = ['b', 'i', 'f', 'l'];
     let o = '~~~~~~~~ByteBase~~~~~~~~\n';
