@@ -5,7 +5,7 @@ const ByteBuffer = require("bytebuffer");
 
 module.exports = ByteBase;
 function ByteBase(path) {
-    this.VERBOSE = false;
+    module.exports.VERBOSE = false;
     this.writeStreams = {};
     this.tableNames = [];
     this.tableKeys = {};
@@ -81,10 +81,28 @@ ByteBase.prototype.initTable = function(name, writing) {
         this.writeStreams[name] = fs.createWriteStream(dir+'data.bin');
 }
 
+/** delete table folder including key.txt and data.bin */
+ByteBase.prototype.deleteTable = function(name) {
+    // the function is only named deleteTable for clarity
+    let deleteRecursive = function(path) {
+        if (!fs.existsSync(path)) return false;
+        fs.readdirSync(path).forEach(function(file, index) {
+            let curPath = path + "/" + file;
+            if (fs.lstatSync(curPath).isDirectory()) deleteRecursive(curPath);
+            else fs.unlinkSync(curPath);
+        });
+        fs.rmdirSync(path);
+        return true;
+    };
+
+    //deleteRecursive(this.path + name);
+};
+
 /** add row(s) to table with given name */
 ByteBase.prototype.append = function(tablename, values) {
     if (!this.writeStreams[tablename]) 
         throw 'Must call initTable(\'name\', true) before writing.';
+
     let key = this.tableKeys[tablename];
     let rows = values.length / key.labels.length;
     if (rows % 1 != 0) throw 'Wrong number of values.';
@@ -113,15 +131,15 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
     if (arguments.length > 2) {
         streamOptions.start = rowOffset * key.rowSize;
         if (arguments.length > 3) 
-            streamOptions.end = streamOptions.start + numRows * key.rowSize;
-    }
+            streamOptions.end = streamOptions.start + numRows * key.rowSize - 1;
+    } if (module.exports.VERBOSE) console.log('streamOptions: %j', streamOptions);
 
     let readStream = fs.createReadStream(
         this.path + name + '/data.bin',
         streamOptions);
     readStream.setEncoding('binary');
     readStream.on('data', function(chunk) {  
-        if (this.VERBOSE) console.log('CHUNK SIZE: '+chunk.length);
+        if (module.exports.VERBOSE) console.log('CHUNK SIZE: '+chunk.length);
         data += chunk;
         let numRows = Math.floor(data.length / key.rowSize);
         if (numRows == 0) return 0;
@@ -141,7 +159,7 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
         }
         data = data.substring(numRows * key.rowSize);
     }).on('end', function() {
-        if (this.VERBOSE) console.log('Done iterating '+name+'!'+' '+data.length);
+        if (module.exports.VERBOSE) console.log('Done iterating '+name+'!'+' '+data.length);
         if (data.length > 0) throw "Iterating table \'%s\' finished with trailing data of incomplete row";
     });
 };
