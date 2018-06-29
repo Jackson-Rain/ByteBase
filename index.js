@@ -19,10 +19,12 @@ for (let i=0; i<pop; i++)
     bytebase.append(name, [i, Math.random()+1, Math.random()+2, Math.random()+3]);
 
 // set callback and end writing
-bytebase.endWriting(name, ()=>{
-    // iterate from dog 1 to dog 4
-    bytebase.iterate(name, (vals) => {
-        for (let i=0; i<vals.length; i++)
-            console.log(labels[i]+': '+vals[i]);
-    }, 0, 9);
-});
+bytebase.endWriting(name)
+    .then((result) => {
+        return bytebase.iterate(name, (vals) => {
+            for (let i=0; i<vals.length; i++)
+                console.log(labels[i]+': '+vals[i]);
+        }, 3, 6);
+    }).then((result) => {
+        console.log('someone let the dogs out');
+    });

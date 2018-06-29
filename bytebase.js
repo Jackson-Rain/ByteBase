@@ -122,45 +122,49 @@ ByteBase.prototype.append = function(tablename, values) {
 
 /** iterate table with given name, calling callback on rows */
 ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
-    let fpath = this.path + name + '/data.bin';
-    let key = this.tableKeys[name];
-    let data = '';
+    return new Promise((resolve, reject) => {
+        let fpath = this.path + name + '/data.bin';
+        let key = this.tableKeys[name];
+        let data = '';
 
-    // create stream options reflecting rowOffset/numRows
-    let streamOptions = {};
-    if (arguments.length > 2) {
-        streamOptions.start = rowOffset * key.rowSize;
-        if (arguments.length > 3) 
-            streamOptions.end = streamOptions.start + numRows * key.rowSize - 1;
-    } if (module.exports.VERBOSE) console.log('streamOptions: %j', streamOptions);
+        // create stream options reflecting rowOffset/numRows
+        let streamOptions = {};
+        if (arguments.length > 2) {
+            streamOptions.start = rowOffset * key.rowSize;
+            if (arguments.length > 3) 
+                streamOptions.end = streamOptions.start + numRows * key.rowSize - 1;
+        } if (module.exports.VERBOSE) console.log('streamOptions: %j', streamOptions);
 
-    let readStream = fs.createReadStream(
-        this.path + name + '/data.bin',
-        streamOptions);
-    readStream.setEncoding('binary');
-    readStream.on('data', function(chunk) {  
-        if (module.exports.VERBOSE) console.log('CHUNK SIZE: '+chunk.length);
-        data += chunk;
-        let numRows = Math.floor(data.length / key.rowSize);
-        if (numRows == 0) return 0;
+        let readStream = fs.createReadStream(
+            this.path + name + '/data.bin',
+            streamOptions);
+        readStream.setEncoding('binary');
+        readStream.on('data', function(chunk) {  
+            if (module.exports.VERBOSE) console.log('CHUNK SIZE: '+chunk.length);
+            data += chunk;
+            let numRows = Math.floor(data.length / key.rowSize);
+            if (numRows == 0) return 0;
 
-        let rowData = Buffer.from(data.substring(0, numRows*key.rowSize), 'binary');
-        let bb = ByteBuffer.wrap(rowData);
-        for (let i=0; i<numRows; i++) {
-            let vals = [];
-            for (let j=0; j<key.types.length; j++)
-                switch (key.types[j]) {
-                    case module.exports.TYPE_BYTE: vals.push(bb.readByte()); break;
-                    case module.exports.TYPE_INT: vals.push(bb.readInt()); break;
-                    case module.exports.TYPE_FLOAT: vals.push(bb.readFloat()); break;
-                    case module.exports.TYPE_LONG: vals.push(bb.readLong()); break;
-                }
-            callback(vals);
-        }
-        data = data.substring(numRows * key.rowSize);
-    }).on('end', function() {
-        if (module.exports.VERBOSE) console.log('Done iterating '+name+'!'+' '+data.length);
-        if (data.length > 0) throw "Iterating table \'%s\' finished with trailing data of incomplete row";
+            let rowData = Buffer.from(data.substring(0, numRows*key.rowSize), 'binary');
+            let bb = ByteBuffer.wrap(rowData);
+            for (let i=0; i<numRows; i++) {
+                let vals = [];
+                for (let j=0; j<key.types.length; j++)
+                    switch (key.types[j]) {
+                        case module.exports.TYPE_BYTE: vals.push(bb.readByte()); break;
+                        case module.exports.TYPE_INT: vals.push(bb.readInt()); break;
+                        case module.exports.TYPE_FLOAT: vals.push(bb.readFloat()); break;
+                        case module.exports.TYPE_LONG: vals.push(bb.readLong()); break;
+                    }
+                callback(vals);
+            }
+            data = data.substring(numRows * key.rowSize);
+        }).on('end', function() {
+            if (module.exports.VERBOSE) console.log('Done iterating '+name+'!'+' '+data.length);
+            if (data.length > 0) throw "Iterating table \'%s\' finished with trailing data of incomplete row";
+            resolve("SUCCESS");
+        });
+        
     });
 };
 
@@ -183,13 +187,22 @@ ByteBase.prototype.print = function() {
 };
 
 /** end open writestreams */
-ByteBase.prototype.endWriting = function(tablename, onEnd) {
-    if (tablename) {
-        if (onEnd) this.writeStreams[tablename].on('finish', onEnd);
-        this.writeStreams[tablename].end();
-        delete this.writeStreams[tablename];
-        return;
-    } // or release all tables
+ByteBase.prototype.endWriting = function(tablename) {
+    // for specific tables, return promise
+    if (tablename)
+        return new Promise((resolve, reject) => {
+            // ensure that writeStreams[name] is deleted before resolving
+            let ended = false, done = false;
+            this.writeStreams[tablename].on('finish', ()=>{ 
+                ended = true;
+                if (true || done) resolve();
+            });
+            this.writeStreams[tablename].end();
+            delete this.writeStreams[tablename];
+            done = true;
+            //if (ended) resolve();
+        });
+    // or release all tables with no promises
     let keys = Object.keys(this.writeStreams);
     for (let i=0; i<keys.length; i++) {
         this.writeStreams[keys[i]].end();
