@@ -3,9 +3,8 @@ var bytebase = new ByteBase('database');
 bytebase.VERBOSE = true;
 
 let name = 'dogs';
-let labels = ['legs', 'weight', 'height', 'length'];
+let labels = ['legs', 'weight', 'height'];
 let types = [ ByteBase.TYPE_INT,
-              ByteBase.TYPE_FLOAT,
               ByteBase.TYPE_FLOAT,
               ByteBase.TYPE_FLOAT, ];
 
@@ -16,15 +15,15 @@ let types = [ ByteBase.TYPE_INT,
 // populate
 let pop = 10;
 for (let i=0; i<pop; i++)
-    bytebase.append(name, [i, Math.random()+1, Math.random()+2, Math.random()+3]);
+    bytebase.append(name, [i, Math.random()+i*2, Math.random()+i]);
 
 // set callback and end writing
 bytebase.endWriting(name)
     .then((result) => {
         return bytebase.iterate(name, (vals) => {
             for (let i=0; i<vals.length; i++)
-                console.log(labels[i]+': '+vals[i]);
-        }, 3, 6);
+                console.log(labels[i]+':\t'+vals[i]);
+        });
     }).then((result) => {
         console.log('someone let the dogs out');
     });

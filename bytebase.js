@@ -84,7 +84,7 @@ ByteBase.prototype.initTable = function(name, writing) {
 /** delete table folder including key.txt and data.bin */
 ByteBase.prototype.deleteTable = function(name) {
     // the function is only named deleteTable for clarity
-    let deleteRecursive = function(path) {
+    const deleteRecursive = function(path) {
         if (!fs.existsSync(path)) return false;
         fs.readdirSync(path).forEach(function(file, index) {
             let curPath = path + "/" + file;
@@ -95,7 +95,7 @@ ByteBase.prototype.deleteTable = function(name) {
         return true;
     };
 
-    //deleteRecursive(this.path + name);
+    deleteRecursive(this.path + name);
 };
 
 /** add row(s) to table with given name */
@@ -114,10 +114,13 @@ ByteBase.prototype.append = function(tablename, values) {
             case module.exports.TYPE_FLOAT: bb.writeFloat(values[i]); break;
             case module.exports.TYPE_LONG: bb.writeLong(values[i]); break;
         }
-    } bb.flip();
+    } 
+    bb.flip();
 
     // write
-    this.writeStreams[tablename].write(bb.buffer);
+    let buf = bb.buffer;
+    if (key.rowSize <= 16) buf = bb.buffer.slice(0, key.rowSize);
+    this.writeStreams[tablename].write(buf);
 };
 
 /** iterate table with given name, calling callback on rows */
