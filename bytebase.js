@@ -66,9 +66,6 @@ ByteBase.prototype.initTable = function(name, writing) {
         rowSize += module.exports.TYPE_SIZES[types[i]];
     } 
     
-    // rowSize < 4 results in empty bytes being appended
-    if (rowSize < 4) throw 'There is currently no support for rowSize < 4';
-    
     this.tableNames.push(name);
     this.tableKeys[name] = {
         labels: labels,

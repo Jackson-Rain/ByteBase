@@ -35,10 +35,10 @@ bytebase.endWriting(tablename).then((result) => {
 
 ### Access an existing table
 ```javascript
-let start = 1, end = 2;
+let start = 1, numRows = 2;
 byteBase.initTable(tablename);
 bytebase.iterate(tablename, (vals) => {
     for (let i=0; i<vals.length; i++)
         console.log(labels[i]+': '+vals[i]);
-}, start, end);
+}, start, numRows);
 ```
