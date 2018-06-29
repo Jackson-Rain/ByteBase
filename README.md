@@ -28,7 +28,7 @@ bytebase.print(); // prints all table keys to console
 bytebase.append(tablename, scruffy);
 bytebase.append(tablename, wiggles);
 bytebase.append(tablename, bartholomew);
-bytebase.endWriting(tablename).then(result) => {
+bytebase.endWriting(tablename).then((result) => {
     // called when writing finishes
 });
 ```
