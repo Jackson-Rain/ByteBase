@@ -15,7 +15,7 @@ function ByteBase(path) {
     this.path = path;
     
     // create path dirs
-    let pfields = this.path.split('[\\/]');
+    let pfields = this.path.split('/');
     for (let i=0; i<pfields.length; i++) {
         let dir = "";
         for (let j=0; j<=i; j++) dir += pfields[j];
