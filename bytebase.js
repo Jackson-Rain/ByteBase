@@ -19,7 +19,7 @@ function ByteBase(path) {
     for (let i=0; i<pfields.length; i++) {
         let dir = pfields[0];
         for (let j=1; j<=i; j++) dir += '/' + pfields[j];
-        try { fs.mkdirSync(dir); }
+        try { if (!fs.existsSync(dir)) fs.mkdirSync(dir); }
         catch (err) { if (err.code != 'EEXIST') throw(err); }
     }
 }
