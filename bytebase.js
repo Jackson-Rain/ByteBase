@@ -17,6 +17,7 @@ function ByteBase(path) {
     // create path dirs
     let pfields = this.path.split('/');
     for (let i=0; i<pfields.length; i++) {
+        if (pfields[i].length == 0) continue;
         let dir = pfields[0];
         for (let j=1; j<=i; j++) dir += '/' + pfields[j];
         try { if (!fs.existsSync(dir)) fs.mkdirSync(dir); }
