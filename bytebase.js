@@ -27,9 +27,10 @@ function ByteBase(path) {
 module.exports = ByteBase;
 // type enumerations
 module.exports.TYPE_BYTE   = 0;
-module.exports.TYPE_INT    = 1;
-module.exports.TYPE_FLOAT  = 2;
-module.exports.TYPE_LONG   = 3;
+module.exports.TYPE_SHORT  = 1;
+module.exports.TYPE_INT    = 2;
+module.exports.TYPE_FLOAT  = 3;
+module.exports.TYPE_LONG   = 4;
 // 0 means null-terminated
 module.exports.TYPE_SIZES = [1,4,4,8]; 
 
@@ -107,6 +108,7 @@ ByteBase.prototype.append = function(tablename, values) {
     for (let i=0; i<values.length; i++) {
         switch (key.types[i % key.labels.length]) {
             case module.exports.TYPE_BYTE: bb.writeByte(values[i]); break;
+            case module.exports.TYPE_SHORT: bb.writeShort(values[i]); break;
             case module.exports.TYPE_INT: bb.writeInt(values[i]); break;
             case module.exports.TYPE_FLOAT: bb.writeFloat(values[i]); break;
             case module.exports.TYPE_LONG: bb.writeLong(values[i]); break;
@@ -152,6 +154,7 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
                 for (let j=0; j<key.types.length; j++)
                     switch (key.types[j]) {
                         case module.exports.TYPE_BYTE: vals.push(bb.readByte()); break;
+                        case module.exports.TYPE_SHORT: vals.push(bb.readShort()); break;
                         case module.exports.TYPE_INT: vals.push(bb.readInt()); break;
                         case module.exports.TYPE_FLOAT: vals.push(bb.readFloat()); break;
                         case module.exports.TYPE_LONG: vals.push(bb.readLong()); break;

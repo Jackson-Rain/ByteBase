@@ -1,5 +1,5 @@
 # ByteBase
-A simple database framework that uses ByteBuffer to store data tables in binary.
+A simple database framework that uses bytebuffer to store data tables in binary.
 
 ## Usage
 ```javascript
@@ -11,13 +11,13 @@ var bytebase = new ByteBase('database'); // 'database' is any directory name
 ```javascript
 let tablename = 'dogs';
 let labels = ['legs', 'weight', 'height', 'length'];
-let types = [ ByteBase.TYPE_INT,
+let types = [ ByteBase.TYPE_BYTE,
               ByteBase.TYPE_FLOAT,
               ByteBase.TYPE_FLOAT,
               ByteBase.TYPE_FLOAT ];
-let scruffy = [1, 23.1, 2.42, 3.68];
-let wiggles = [4, 13.6, 1.01, 7.9];
-let bartholomew = [2, 180.6, 6.12, 2.4];
+let scruffy = [1, 23.15, 2.42, 3.68];
+let wiggles = [4, 13.62, 1.01, 7.59];
+let patches = [2, 180.6, 6.12, 2.14];
 
 // create and open table for writing
 bytebase.createTable(tablename, labels, types);
@@ -27,7 +27,7 @@ bytebase.print(); // prints all table keys to console
 // append a bunch of dogs and then end the writeStream
 bytebase.append(tablename, scruffy);
 bytebase.append(tablename, wiggles);
-bytebase.append(tablename, bartholomew);
+bytebase.append(tablename, patches);
 bytebase.endWriting(tablename).then((result) => {
     // called when writing finishes
 });
