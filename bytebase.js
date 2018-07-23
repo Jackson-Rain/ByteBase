@@ -17,8 +17,8 @@ function ByteBase(path) {
     // create path dirs
     let pfields = this.path.split('/');
     for (let i=0; i<pfields.length; i++) {
-        let dir = "";
-        for (let j=0; j<=i; j++) dir += pfields[j];
+        let dir = pfields[0];
+        for (let j=1; j<=i; j++) dir += '/' + pfields[j];
         try { fs.mkdirSync(dir); }
         catch (err) { if (err.code != 'EEXIST') throw(err); }
     }
@@ -32,7 +32,7 @@ module.exports.TYPE_INT    = 2;
 module.exports.TYPE_FLOAT  = 3;
 module.exports.TYPE_LONG   = 4;
 // 0 means null-terminated
-module.exports.TYPE_SIZES = [1,4,4,8]; 
+module.exports.TYPE_SIZES = [1,2,4,4,8]; 
 
 /** creates folder, and table key file */
 ByteBase.prototype.createTable = function(name, labels, types) {
@@ -173,7 +173,7 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
 
 /** print column names and data types for all tables */
 ByteBase.prototype.print = function() {
-    let types = ['b', 'i', 'f', 'l'];
+    let types = ['b', 's', 'i', 'f', 'l'];
     let o = '~~~~~~~~ByteBase~~~~~~~~\n';
     o += 'path: ' + this.path + '\n';
     o += '--------\n';

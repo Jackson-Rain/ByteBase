@@ -1,5 +1,5 @@
 var ByteBase = require('./bytebase.js');
-var bytebase = new ByteBase('database');
+var bytebase = new ByteBase('path/to/database');
 bytebase.VERBOSE = true;
 
 let name = 'dogs';
@@ -8,6 +8,7 @@ let types = [ ByteBase.TYPE_INT,
               ByteBase.TYPE_FLOAT,
               ByteBase.TYPE_FLOAT, ];
 
+  bytebase.deleteTable(name);
   bytebase.createTable(name, labels, types);
   bytebase.initTable(name, true);
   bytebase.print();
