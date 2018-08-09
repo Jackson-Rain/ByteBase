@@ -3,7 +3,6 @@
 const fs = require('fs');
 const ByteBuffer = require("bytebuffer");
 
-module.exports = ByteBase;
 function ByteBase(path) {
     module.exports.VERBOSE = false;
     this.writeStreams = {};
@@ -37,13 +36,19 @@ module.exports.TYPE_SIZES = [1,2,4,4,8];
 
 /** creates folder, and table key file */
 ByteBase.prototype.createTable = function(name, labels, types) {
-    let dir = this.path + "/" + name + "/";
+    let dir = this.path + name + "/";
     // err if table exists
     if (fs.existsSync(dir+'key.txt')) throw "Table \'"+name+"\' already exists!";
 
     // create dir and write labels+types to dir/key.txt
-    try { fs.mkdirSync(dir); }
-    catch (err) { if (err.code != 'EEXIST') throw(err); }
+    let nfields = name.split('[\\\\/]');
+    for (let i=0; i<nfields.length; i++) {
+      let dirname = nfields[0];
+      for (let j=1; j<=i; j++) dirname += '/' + nfields[j];
+      console.log('~'+dirname);
+      try { fs.mkdirSync(this.path + dirname); }
+      catch (err) { if (err.code != 'EEXIST') throw(err); }
+    }
     
     // key.txt can just be a csv, lets be nice
     let o = labels[0];
