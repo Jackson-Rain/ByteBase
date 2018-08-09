@@ -30,7 +30,7 @@ module.exports.TYPE_BYTE   = 0;
 module.exports.TYPE_SHORT  = 1;
 module.exports.TYPE_INT    = 2;
 module.exports.TYPE_FLOAT  = 3;
-module.exports.TYPE_LONG   = 4;
+module.exports.TYPE_DOUBLE   = 4;
 // 0 means null-terminated
 module.exports.TYPE_SIZES = [1,2,4,4,8]; 
 
@@ -117,7 +117,7 @@ ByteBase.prototype.append = function(tablename, values) {
             case module.exports.TYPE_SHORT: bb.writeShort(values[i]); break;
             case module.exports.TYPE_INT: bb.writeInt(values[i]); break;
             case module.exports.TYPE_FLOAT: bb.writeFloat(values[i]); break;
-            case module.exports.TYPE_LONG: bb.writeLong(values[i]); break;
+            case module.exports.TYPE_DOUBLE: bb.writeDouble(values[i]); break;
         }
     } 
     bb.flip();
@@ -163,7 +163,7 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
                         case module.exports.TYPE_SHORT: vals.push(bb.readShort()); break;
                         case module.exports.TYPE_INT: vals.push(bb.readInt()); break;
                         case module.exports.TYPE_FLOAT: vals.push(bb.readFloat()); break;
-                        case module.exports.TYPE_LONG: vals.push(bb.readLong()); break;
+                        case module.exports.TYPE_DOUBLE: vals.push(bb.readDouble()); break;
                     }
                 callback(vals);
             }

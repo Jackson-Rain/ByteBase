@@ -6,12 +6,12 @@ let name = 'dogs';
 let labels = ['legs', 'weight', 'height'];
 let types = [ ByteBase.TYPE_INT,
               ByteBase.TYPE_FLOAT,
-              ByteBase.TYPE_FLOAT, ];
+              ByteBase.TYPE_DOUBLE, ];
 
-  bytebase.deleteTable(name);
-  bytebase.createTable(name, labels, types);
-  bytebase.initTable(name, true);
-  bytebase.print();
+bytebase.deleteTable(name);
+bytebase.createTable(name, labels, types);
+bytebase.initTable(name, true);
+bytebase.print();
 
 // populate
 let pop = 10;
