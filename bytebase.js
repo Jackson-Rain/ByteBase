@@ -41,7 +41,7 @@ ByteBase.prototype.createTable = function(name, labels, types) {
     if (fs.existsSync(dir+'key.txt')) throw "Table \'"+name+"\' already exists!";
 
     // create dir and write labels+types to dir/key.txt
-    let nfields = name.split('[\\\\/]');
+    let nfields = name.split(/[/\\\\]/);
     for (let i=0; i<nfields.length; i++) {
       let dirname = nfields[0];
       for (let j=1; j<=i; j++) dirname += '/' + nfields[j];
