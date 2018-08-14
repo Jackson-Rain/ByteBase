@@ -124,7 +124,7 @@ ByteBase.prototype.append = function(tablename, values) {
 
     // write
     let buf = bb.buffer;
-    if (key.rowSize <= 16) buf = bb.buffer.slice(0, key.rowSize);
+    buf = bb.buffer.slice(0, key.rowSize); // say shoo shoo to pesky bytebuffer padding bytes
     this.writeStreams[tablename].write(buf);
 };
 
