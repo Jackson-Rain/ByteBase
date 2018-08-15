@@ -3,11 +3,18 @@
 const fs = require('fs');
 const ByteBuffer = require("bytebuffer");
 
-function ByteBase(path) {
+function ByteBase(path, opts) {
     module.exports.VERBOSE = false;
     this.writeStreams = {};
     this.tableNames = [];
     this.tableKeys = {};
+    this.littleEndian = false;
+
+    // apply whatever options
+    if (opts) {
+      if (opts.littleEndian) this.littleEndian = opts.littleEndian;
+    }
+
     // format path before setting
     path = path.replace('\\', '/');
     if (!path.endsWith('/')) path += '/';
@@ -110,7 +117,7 @@ ByteBase.prototype.append = function(tablename, values) {
     let key = this.tableKeys[tablename];
     let rows = values.length / key.labels.length;
     if (rows % 1 != 0) throw 'Wrong number of values.';
-    let bb = new ByteBuffer();
+    let bb = new ByteBuffer(rowSize * rows, this.littleEndian);
     for (let i=0; i<values.length; i++) {
         switch (key.types[i % key.labels.length]) {
             case module.exports.TYPE_BYTE: bb.writeByte(values[i]); break;
@@ -154,7 +161,7 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
             if (numRows == 0) return 0;
 
             let rowData = Buffer.from(data.substring(0, numRows*key.rowSize), 'binary');
-            let bb = ByteBuffer.wrap(rowData);
+            let bb = ByteBuffer.wrap(rowData, this.littleEndian);
             for (let i=0; i<numRows; i++) {
                 let vals = [];
                 for (let j=0; j<key.types.length; j++)
