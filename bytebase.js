@@ -117,7 +117,7 @@ ByteBase.prototype.append = function(tablename, values) {
     let key = this.tableKeys[tablename];
     let rows = values.length / key.labels.length;
     if (rows % 1 != 0) throw 'Wrong number of values.';
-    let bb = new ByteBuffer(rowSize * rows, this.littleEndian);
+    let bb = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, this.littleEndian);
     for (let i=0; i<values.length; i++) {
         switch (key.types[i % key.labels.length]) {
             case module.exports.TYPE_BYTE: bb.writeByte(values[i]); break;
