@@ -3,4 +3,3 @@ node_modules/*
 database/
 database/*
 debug.sh
-test.js
