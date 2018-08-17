@@ -38,7 +38,7 @@ module.exports.TYPE_SHORT  = 1;
 module.exports.TYPE_INT    = 2;
 module.exports.TYPE_FLOAT  = 3;
 module.exports.TYPE_DOUBLE   = 4;
-// 0 means null-terminated
+module.exports.TYPES = ['b','s','i','f','d'];
 module.exports.TYPE_SIZES = [1,2,4,4,8]; 
 
 /** creates folder, and table key file */
@@ -117,7 +117,7 @@ ByteBase.prototype.append = function(tablename, values) {
     let key = this.tableKeys[tablename];
     let rows = values.length / key.labels.length;
     if (rows % 1 != 0) throw 'Wrong number of values.';
-    let bb = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, this.littleEndian);
+    let bb = new ByteBuffer().order(this.littleEndian);
     for (let i=0; i<values.length; i++) {
         switch (key.types[i % key.labels.length]) {
             case module.exports.TYPE_BYTE: bb.writeByte(values[i]); break;
@@ -131,7 +131,7 @@ ByteBase.prototype.append = function(tablename, values) {
 
     // write
     let buf = bb.buffer;
-    buf = bb.buffer.slice(0, key.rowSize); // say shoo shoo to pesky bytebuffer padding bytes
+    buf = bb.buffer.slice(0, key.rowSize); // omit pesky bytebuffer padding bytes
     this.writeStreams[tablename].write(buf);
 };
 
@@ -154,14 +154,14 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
             this.path + name + '/data.bin',
             streamOptions);
         readStream.setEncoding('binary');
-        readStream.on('data', function(chunk) {  
+        readStream.on('data', (chunk) => {  
             if (module.exports.VERBOSE) console.log('CHUNK SIZE: '+chunk.length);
             data += chunk;
             let numRows = Math.floor(data.length / key.rowSize);
             if (numRows == 0) return 0;
 
             let rowData = Buffer.from(data.substring(0, numRows*key.rowSize), 'binary');
-            let bb = ByteBuffer.wrap(rowData, this.littleEndian);
+            let bb = ByteBuffer.wrap(rowData).order(this.littleEndian);
             for (let i=0; i<numRows; i++) {
                 let vals = [];
                 for (let j=0; j<key.types.length; j++)
@@ -186,7 +186,6 @@ ByteBase.prototype.iterate = function(name, callback, rowOffset, numRows) {
 
 /** print column names and data types for all tables */
 ByteBase.prototype.print = function() {
-    let types = ['b', 's', 'i', 'f', 'l'];
     let o = '~~~~~~~~ByteBase~~~~~~~~\n';
     o += 'path: ' + this.path + '\n';
     o += '--------\n';
@@ -195,7 +194,7 @@ ByteBase.prototype.print = function() {
         let key = this.tableKeys[this.tableNames[k]];
         for (let l=0; l<key.types.length; l++) {
             o += ' ' + key.labels[l] + '(';
-            o += types[key.types[l]] + ')\n';
+            o += ByteBase.TYPES[key.types[l]] + ')\n';
         }
     }
     o += '~~~~~~~~~~~~~~~~~~~~~~~~';

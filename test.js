@@ -1,7 +1,7 @@
 const VERBOSE = true;
 
 const ByteBase = require('./bytebase.js');
-var bb = new ByteBase('test');
+var bb = new ByteBase('test', {littleEndian: false});
 bb.VERBOSE = true;
 
 let testing = false;
@@ -27,7 +27,7 @@ function testLoop() {
 
 // test some different combinations of data types and a range of rowsizes
 function test(types, mult, clear) {
-  let typestr = 'bsifd'.split(''); //todo: update this when new types added
+  let typestr = ByteBase.TYPES;
   if (!mult) mult = 1;
   let name = '';
   for (let m=0; m<mult; m++)
